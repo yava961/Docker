@@ -3,7 +3,7 @@ version: '3.8'
 x-constants:
   db: &dbEnv
     DB_HOST: db
-    DB_PORT: 1248
+    DB_PORT: 3306
     MYSQL_DATABASE: default
     MYSQL_ROOT_PASSWORD: password
   app: &appEnv
@@ -12,17 +12,20 @@ x-constants:
     DB_HOST: db
     DB_PORT: 1248
     MYSQL_DATABASE: default
-    MYSQL_ROOT_PASSWORD: password
-    MYSQL_ROOT_USERNAME: root
+    SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:1248/default
+    SPRING_DATASOURCE_USERNAME: root
+    SPRING_DATASOURCE_PASSWORD: password
+    SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
 services:
   db:
     image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       <<: *dbEnv
     volumes:
-      - mysql-datavolume:/var/lib/mysql
+        - mysql-dataVolume:/var/lib/mysql
     ports:
       - '1248:3306'
   app:
@@ -31,7 +34,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - '8080:8080'
+    tty: true
     environment:
 
       <<: *appEnv
@@ -39,4 +43,4 @@ services:
       - db
 
 volumes:
-  mysql-datavolume:
+  mysql-dataVolume:
